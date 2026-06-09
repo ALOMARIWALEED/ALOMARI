@@ -79,7 +79,7 @@ body { background: var(--bg); font-family: 'Cairo', sans-serif; min-height: 100v
 .search-box-wrap button { background: var(--main); color: white; border: none; padding: 0 24px; font-weight: 700; font-family: 'Cairo', sans-serif; }
 .stat-box { background: var(--main-light); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; }
 .stat-box h3 { color: var(--main); font-weight: 900; font-size: 1.5rem; margin-bottom: 2px; }
-.stat-box p { font-size: 11px; color: #6c757d; margin: 0; font-weight: 700; }
+.stat-box p { font-size: 12px; color: #6c757d; margin: 0; font-weight: 700; }
 .points-badge { background: var(--main-light); color: var(--main); padding: 8px 18px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; display: inline-block; }
 .rank-number { font-size: 3.5rem; font-weight: 900; color: var(--accent); text-shadow: 2px 2px 0 rgba(0,0,0,0.06); line-height: 1; }
 
@@ -208,10 +208,9 @@ body { background: var(--bg); font-family: 'Cairo', sans-serif; min-height: 100v
 
       <h5 class="fw-bold mb-3" style="color:#555; font-size:0.95rem;"><i class="fa-solid fa-chart-pie me-1" style="color:var(--main);"></i> تفاصيل معايير الترقية</h5>
       <div class="row g-3">
-        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pSeniority">0</h3><p>نقاط الأقدمية</p></div></div>
-        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pEdu">0</h3><p>المؤهلات العلمية</p></div></div>
-        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pCourses">0</h3><p>الدورات التدريبية</p></div></div>
-        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pPerf">0</h3><p>تقييم الأداء</p></div></div>
+        <div class="col-4"><div class="stat-box"><h3 id="pSeniority">0</h3><p>نقاط الأقدمية</p></div></div>
+        <div class="col-4"><div class="stat-box"><h3 id="pEdu">0</h3><p>نقاط المؤهلات</p></div></div>
+        <div class="col-4"><div class="stat-box"><h3 id="pOther">0</h3><p>أخرى</p></div></div>
       </div>
 
       <div class="text-center mt-4 py-4" style="background:var(--main-light);border-radius:var(--radius-sm);">
@@ -307,7 +306,7 @@ body { background: var(--bg); font-family: 'Cairo', sans-serif; min-height: 100v
               <thead>
                 <tr>
                   <th>السرا</th><th>الرقم العسكري</th><th>الاسم</th><th>الرتبة الحالية</th><th>المستحقة</th>
-                  <th>الأقدمية</th><th>المؤهلات</th><th>الدورات</th><th>الأداء</th><th>الإجمالي</th>
+                  <th>الأقدمية</th><th>المؤهلات</th><th>أخرى</th><th>الإجمالي</th>
                   <th id="th-actions">إجراءات</th>
                 </tr>
               </thead>
@@ -383,10 +382,9 @@ body { background: var(--bg); font-family: 'Cairo', sans-serif; min-height: 100v
               </select>
             </div>
             <div class="col-12"><hr><h6 class="fw-bold" style="color:#555;">توزيع النقاط التفصيلي</h6></div>
-            <div class="col-6 col-md-3"><label class="form-label small fw-bold">الأقدمية</label><input type="number" step="0.01" min="0" id="formPSeniority" class="form-control" value="0" oninput="calcModalTotal()"></div>
-            <div class="col-6 col-md-3"><label class="form-label small fw-bold">المؤهلات</label><input type="number" step="0.01" min="0" id="formPEdu" class="form-control" value="0" oninput="calcModalTotal()"></div>
-            <div class="col-6 col-md-3"><label class="form-label small fw-bold">الدورات</label><input type="number" step="0.01" min="0" id="formPCourses" class="form-control" value="0" oninput="calcModalTotal()"></div>
-            <div class="col-6 col-md-3"><label class="form-label small fw-bold">الأداء</label><input type="number" step="0.01" min="0" id="formPPerf" class="form-control" value="0" oninput="calcModalTotal()"></div>
+            <div class="col-12 col-md-4"><label class="form-label small fw-bold">الأقدمية</label><input type="number" step="0.01" min="0" id="formPSeniority" class="form-control" value="0" oninput="calcModalTotal()"></div>
+            <div class="col-12 col-md-4"><label class="form-label small fw-bold">المؤهلات</label><input type="number" step="0.01" min="0" id="formPEdu" class="form-control" value="0" oninput="calcModalTotal()"></div>
+            <div class="col-12 col-md-4"><label class="form-label small fw-bold">أخرى</label><input type="number" step="0.01" min="0" id="formPOther" class="form-control" value="0" oninput="calcModalTotal()"></div>
             <div class="col-12">
               <div style="background:var(--main-light);border-radius:10px;padding:12px 16px;text-align:center;">
                 <span class="fw-bold" style="color:#555; font-size:0.9rem;">إجمالي النقاط: </span><span id="modalTotal" style="font-size:1.4rem;font-weight:900;color:var(--main);">0</span>
@@ -457,7 +455,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const ARABIC_FONT_AMIRI = "AAEAAAASAQAABAAwR0RFRgBAADgAAAEsAAAAQEdQTVMA0wDbAAABdAAAACZHU1VClbyXfQAAAdgAAAB0T1MvMn8Wki8AAAH0AAAAYGNtYXAYbBFVAAACRAAAAGRjYXR0D6IOVwAAAwQAAADkZ2FzcAAAABAAAAEAAAAAEGdseWb7TkyEAAADGAAABvhoZWFkHLw6swAAAfgAAAA2aGhlYQfCAvQAAAIwAAAAJGhtdHgX6AAAAAABFAAAABRsb2NhBLYGugAAArQAAAAMbWF4cAEfAnUAAAJgAAAAKG5hbWUpXwWwAAAEQAAAAGJwb3N0uB36PAAABTAAAAAgcHJlcB6b7bMAAAdwAAAAZAAFAyMCmQAAArwE0gAABfME0gAABfMAAAACeAAAAAMAAAAAAAAAAAAAAABBUklBTAAAAAAAAD9AAgAsAAAAAQAA/wUAAgAAAAAAAgAAAAEAAQABAAAAAQAAAAEAAAAAAAEAAAADAAAAAwAAAAEAAAADAAAAAQAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAQAAAAEAAQAAAAEAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAA==";
+const ARABIC_FONT_AMIRI = "AAEAAAASAQAABAAwR0RFRgBAADgAAAEsAAAAQEdQTVMA0wDbAAABdAAAACZHU1VClbyXfQAAAdgAAAB0T1MvMn8Wki8AAAH0AAAAYGNtYXAYbBFVAAACRAAAAGRjYXR0D6IOVwAAAwQAAADkZ2FzcAAAABAAAAEAAAAAEGdseWb7TkyEAAADGAAABvhoZWFkHLw6swAAAfgAAAA2aGhlYQfCAvQAAAIwAAAAJGhtdHgX6AAAAAABFAAAABRsb2NhBLYGugAAArQAAAAMbWF4cAEfAnUAAAJgAAAAKG5hbWUpXwWwAAAEQAAAAGJwb3N0uB36PAAABTAAAAAgcHJlcB6b7bMAAAdwAAAAZAAFAyMCmQAAArwE0gAABfME0gAABfMAAAACeAAAAAMAAAAAAAAAAAAAAABBUklBTAAAAAAAAD9AAgAsAAAAAQAA/wUAAgAAAAAAAgAAAAEAAQABAAAAAQAAAAEAAAAAAAEAAAADAAAAAwAAAAEAAAADAAAAAQAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAAADAAAAAwAAAAEAAQAAAAEAAQAAAAEAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAAAAAQABAA==";
 
 let staffList = [], usersList = {}, logsList = [];
 let filteredList = [];
@@ -591,7 +589,7 @@ function editUserModal(login) {
   document.getElementById('userModalTitle').textContent = "تعديل بيانات الموظف";
   document.getElementById('uEditMode').value = "edit";
   document.getElementById('uLogin').value = u.login;
-  document.getElementById('uLogin').setAttribute('readonly', 'true'); // لا يمكن تغيير الـ login الأساسي
+  document.getElementById('uLogin').setAttribute('readonly', 'true');
   document.getElementById('uName').value = u.name;
   document.getElementById('uPass').value = u.pass;
   document.getElementById('uId').value = u.id || '';
@@ -670,8 +668,7 @@ function searchMilitaryId() {
     document.getElementById('resNextRank').textContent = person.nextRank;
     document.getElementById('pSeniority').textContent = person.pSeniority || 0;
     document.getElementById('pEdu').textContent = person.pEdu || 0;
-    document.getElementById('pCourses').textContent = person.pCourses || 0;
-    document.getElementById('pPerf').textContent = person.pPerf || 0;
+    document.getElementById('pOther').textContent = person.pOther || 0;
     document.getElementById('resTotalPoints').textContent = person.totalPoints;
     document.getElementById('resQueueNum').textContent = index + 1;
     resultCard.classList.remove('d-none'); alert.style.display = 'none';
@@ -698,7 +695,7 @@ function renderAdminTable() {
   const tbody = document.getElementById('adminStaffTbody');
   if (!tbody) return;
   filteredList = getFilteredList();
-  if (filteredList.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="text-muted p-4">لا توجد سجلات تطابق البحث</td></tr>`; return; }
+  if (filteredList.length === 0) { tbody.innerHTML = `<tr><td colspan="10" class="text-muted p-4">لا توجد سجلات تطابق البحث</td></tr>`; return; }
   
   const isViewer = currentUser && currentUser.role === 'viewer';
   const fullRankMap = {};
@@ -714,7 +711,7 @@ function renderAdminTable() {
       <td><span class="badge" style="background:var(--main);color:white;font-size:0.85rem;">#${realRank}</span></td>
       <td><strong>${staff.militaryId}</strong></td><td>${staff.name}</td>
       <td><span class="badge bg-primary-soft">${staff.rank}</span></td><td><span class="badge bg-success-soft">${staff.nextRank}</span></td>
-      <td>${staff.pSeniority || 0}</td><td>${staff.pEdu || 0}</td><td>${staff.pCourses || 0}</td><td>${staff.pPerf || 0}</td>
+      <td>${staff.pSeniority || 0}</td><td>${staff.pEdu || 0}</td><td>${staff.pOther || 0}</td>
       <td><strong style="color:var(--main);">${staff.totalPoints}</strong></td>${actionCols}
     </tr>`;
   }).join('');
@@ -748,9 +745,8 @@ function updateChart() {
 function calcModalTotal() {
   const s = parseFloat(document.getElementById('formPSeniority').value) || 0;
   const e = parseFloat(document.getElementById('formPEdu').value) || 0;
-  const c = parseFloat(document.getElementById('formPCourses').value) || 0;
-  const p = parseFloat(document.getElementById('formPPerf').value) || 0;
-  document.getElementById('modalTotal').textContent = parseFloat((s + e + c + p).toFixed(2));
+  const o = parseFloat(document.getElementById('formPOther').value) || 0;
+  document.getElementById('modalTotal').textContent = parseFloat((s + e + o).toFixed(2));
 }
 
 function openAddModal() {
@@ -758,7 +754,7 @@ function openAddModal() {
   document.getElementById('formId').value = "";
   document.getElementById('formMilId').removeAttribute('readonly');
   ['formMilId','formName'].forEach(id => document.getElementById(id).value = '');
-  ['formPSeniority','formPEdu','formPCourses','formPPerf'].forEach(id => document.getElementById(id).value = 0);
+  ['formPSeniority','formPEdu','formPOther'].forEach(id => document.getElementById(id).value = 0);
   calcModalTotal(); modalInstance.show();
 }
 
@@ -774,8 +770,7 @@ function openEditModal(milId) {
   document.getElementById('formNextRank').value = staff.nextRank;
   document.getElementById('formPSeniority').value = staff.pSeniority || 0;
   document.getElementById('formPEdu').value = staff.pEdu || 0;
-  document.getElementById('formPCourses').value = staff.pCourses || 0;
-  document.getElementById('formPPerf').value = staff.pPerf || 0;
+  document.getElementById('formPOther').value = staff.pOther || 0;
   calcModalTotal(); modalInstance.show();
 }
 
@@ -786,12 +781,11 @@ async function saveStaffForm() {
   const nextRank = document.getElementById('formNextRank').value;
   const pSeniority = parseFloat(document.getElementById('formPSeniority').value) || 0;
   const pEdu = parseFloat(document.getElementById('formPEdu').value) || 0;
-  const pCourses = parseFloat(document.getElementById('formPCourses').value) || 0;
-  const pPerf = parseFloat(document.getElementById('formPPerf').value) || 0;
-  const totalPoints = parseFloat((pSeniority + pEdu + pCourses + pPerf).toFixed(2));
+  const pOther = parseFloat(document.getElementById('formPOther').value) || 0;
+  const totalPoints = parseFloat((pSeniority + pEdu + pOther).toFixed(2));
   const isNew = document.getElementById('formId').value === "";
   
-  await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pCourses, pPerf, totalPoints });
+  await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pOther, totalPoints });
   logActivity(isNew ? 'إضافة منسوب' : 'تعديل بيانات', `تم ${isNew ? 'إضافة' : 'تعديل'} السجل العسكري: ${milId} (${name}) برصيد ${totalPoints}`);
   modalInstance.hide(); showAlert('importAlert', 'تم حفظ البيانات بنجاح ✓', 'success');
 }
@@ -832,11 +826,10 @@ function importExcel(event) {
         const nextRank = String(row['الرتبة المستحقة'] || row['nextRank'] || 'جندي أول').trim();
         const pSeniority = parseFloat(row['نقاط الأقدمية'] || row['pSeniority'] || 0);
         const pEdu = parseFloat(row['نقاط المؤهلات'] || row['pEdu'] || 0);
-        const pCourses = parseFloat(row['نقاط الدورات'] || row['pCourses'] || 0);
-        const pPerf = parseFloat(row['نقاط الأداء'] || row['pPerf'] || 0);
-        const totalPoints = parseFloat((pSeniority + pEdu + pCourses + pPerf).toFixed(2));
+        const pOther = parseFloat(row['أخرى'] || row['pOther'] || 0);
+        const totalPoints = parseFloat((pSeniority + pEdu + pOther).toFixed(2));
         if (!milId || !name) continue;
-        await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pCourses, pPerf, totalPoints });
+        await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pOther, totalPoints });
         count++;
       }
       logActivity('استيراد Excel', `تم استيراد/تحديث بيانات لعدد ${count} منسوب`);
@@ -848,15 +841,15 @@ function importExcel(event) {
 }
 
 function downloadExcelTemplate() {
-  const headers = [['الرقم العسكري','الاسم','الرتبة الحالية','الرتبة المستحقة','نقاط الأقدمية','نقاط المؤهلات','نقاط الدورات','نقاط الأداء']];
-  const sample = [['12345','مثال للاسم','جندي','جندي أول',40,15,20,25]];
+  const headers = [['الرقم العسكري','الاسم','الرتبة الحالية','الرتبة المستحقة','نقاط الأقدمية','نقاط المؤهلات','أخرى']];
+  const sample = [['12345','مثال للاسم','جندي','جندي أول',40,15,20]];
   const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([...headers, ...sample]);
   ws['!cols'] = headers[0].map(() => ({ wch: 18 })); XLSX.utils.book_append_sheet(wb, ws, 'مسار'); XLSX.writeFile(wb, 'نموذج_إدخال_مسار.xlsx');
 }
 
 function exportExcel() {
   logActivity('تصدير تقرير', 'تم تصدير كشف السرا بصيغة Excel');
-  const data = staffList.map((s, i) => ({ 'الترتيب': i + 1, 'الرقم العسكري': s.militaryId, 'الاسم الكامل': s.name, 'الرتبة الحالية': s.rank, 'الرتبة المستحقة': s.nextRank, 'نقاط الأقدمية': s.pSeniority || 0, 'نقاط المؤهلات': s.pEdu || 0, 'نقاط الدورات': s.pCourses || 0, 'نقاط الأداء': s.pPerf || 0, 'إجمالي النقاط': s.totalPoints }));
+  const data = staffList.map((s, i) => ({ 'الترتيب': i + 1, 'الرقم العسكري': s.militaryId, 'الاسم الكامل': s.name, 'الرتبة الحالية': s.rank, 'الرتبة المستحقة': s.nextRank, 'نقاط الأقدمية': s.pSeniority || 0, 'نقاط المؤهلات': s.pEdu || 0, 'أخرى': s.pOther || 0, 'إجمالي النقاط': s.totalPoints }));
   const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = Object.keys(data[0] || {}).map(() => ({ wch: 18 }));
   XLSX.utils.book_append_sheet(wb, ws, 'مسار الترقيات'); XLSX.writeFile(wb, 'مسار_الترقيات.xlsx');
 }
@@ -866,8 +859,8 @@ function exportPDF() {
   const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   doc.addFileToVFS("Amiri-Regular.ttf", ARABIC_FONT_AMIRI); doc.addFont("Amiri-Regular.ttf", "Amiri", "normal"); doc.setFont("Amiri");
   doc.setFontSize(18); doc.text('برنامج مسار - كشف أولويات سرا ترقيات ضباط الصف', 287, 18, { align: 'right' }); doc.setFontSize(11); doc.text('تاريخ التصدير المباشر: ' + new Date().toLocaleDateString('ar-SA'), 287, 26, { align: 'right' });
-  const head = [['الإجمالي', 'الأداء', 'الدورات', 'المؤهلات', 'الأقدمية', 'الرتبة المستحقة', 'الرتبة الحالية', 'الاسم الكامل', 'الرقم العسكري', 'السرا']];
-  const body = staffList.map((s, i) => [s.totalPoints, s.pPerf || 0, s.pCourses || 0, s.pEdu || 0, s.pSeniority || 0, s.nextRank, s.rank, s.name, s.militaryId, i + 1]);
+  const head = [['الإجمالي', 'أخرى', 'المؤهلات', 'الأقدمية', 'الرتبة المستحقة', 'الرتبة الحالية', 'الاسم الكامل', 'الرقم العسكري', 'السرا']];
+  const body = staffList.map((s, i) => [s.totalPoints, s.pOther || 0, s.pEdu || 0, s.pSeniority || 0, s.nextRank, s.rank, s.name, s.militaryId, i + 1]);
   doc.autoTable({ head, body, startY: 32, styles: { font: 'Amiri', fontSize: 10, halign: 'center' }, headStyles: { fillColor: [31, 78, 120], textColor: 255, fontStyle: 'bold' }, alternateRowStyles: { fillColor: [238, 243, 250] }, margin: { left: 10, right: 10 } });
   doc.save('مسار_كشف_الترقيات_العام.pdf');
 }
@@ -876,8 +869,8 @@ async function exportWord() {
   logActivity('تصدير تقرير', 'تم تصدير كشف السرا بصيغة Word');
   if (typeof docx === 'undefined') { showAlert('importAlert', 'مكتبة Word لم تُحمّل بعد.', 'danger'); return; }
   const { Document, Packer, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, HeadingLevel } = docx;
-  const headerRow = new TableRow({ children: ['إجمالي النقاط','نقاط الأداء','نقاط الدورات','نقاط المؤهلات','نقاط الأقدمية','الرتبة المستحقة','الرتبة الحالية','الاسم','الرقم العسكري','السرا'].map(text => new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, bold: true, size: 20, font: 'Cairo' })] })], background: '#1f4e78' }))});
-  const dataRows = staffList.map((s, i) => new TableRow({ children: [String(s.totalPoints), String(s.pPerf || 0), String(s.pCourses || 0), String(s.pEdu || 0), String(s.pSeniority || 0), s.nextRank, s.rank, s.name, s.militaryId, String(i + 1)].map(text => new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, size: 18, font: 'Cairo' })] })] }))}));
+  const headerRow = new TableRow({ children: ['إجمالي النقاط','أخرى','نقاط المؤهلات','نقاط الأقدمية','الرتبة المستحقة','الرتبة الحالية','الاسم','الرقم العسكري','السرا'].map(text => new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, bold: true, size: 20, font: 'Cairo' })] })], background: '#1f4e78' }))});
+  const dataRows = staffList.map((s, i) => new TableRow({ children: [String(s.totalPoints), String(s.pOther || 0), String(s.pEdu || 0), String(s.pSeniority || 0), s.nextRank, s.rank, s.name, s.militaryId, String(i + 1)].map(text => new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, size: 18, font: 'Cairo' })] })] }))}));
   const doc2 = new Document({ sections: [{ properties: { bidi: true }, children: [new Paragraph({ text: 'برنامج مسار الإلكتروني - جناح الإدارة', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }), new Paragraph({ text: 'كشف سرا ببيانات ترقيات ضباط الصف المستحقين', alignment: AlignmentType.CENTER }), new Paragraph({ text: 'التاريخ: ' + new Date().toLocaleDateString('ar-SA'), alignment: AlignmentType.CENTER }), new Paragraph({ text: '' }), new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE } })] }] });
   const buffer = await Packer.toBlob(doc2); const url = URL.createObjectURL(buffer); const a = document.createElement('a'); a.href = url; a.download = 'مسار_قائمة_الترقيات.docx'; a.click(); URL.revokeObjectURL(url);
 }
@@ -885,7 +878,7 @@ async function exportWord() {
 // ========== PRINT PERSON CARD ==========
 function printPersonCard() {
   if (!currentPersonForPrint) return; const p = currentPersonForPrint; const w = window.open('', '_blank', 'width=600,height=700');
-  w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet"><style>body{font-family:'Cairo',sans-serif;padding:30px;background:#f4f7fa;}.card{background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:500px;margin:0 auto;}h2{color:#1f4e78;font-size:1.5rem;font-weight:900;text-align:center;margin-bottom:4px;}.sub{text-align:center;color:#e2b372;font-size:0.85rem;font-weight:700;margin-bottom:20px;}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef3fa;font-size:0.9rem;}.label{color:#6c757d;font-weight:700;}.value{font-weight:800;color:#1a1a2e;}.pts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}.pt-box{background:#eef3fa;border-radius:10px;padding:12px;text-align:center;}.pt-box h3{color:#1f4e78;font-weight:900;margin:0 0 4px;}.pt-box p{font-size:0.75rem;color:#6c757d;margin:0;font-weight:700;}.rank-badge{background:#1f4e78;color:white;border-radius:30px;padding:10px 20px;text-align:center;font-size:2rem;font-weight:900;margin:20px auto;display:block;width:fit-content;}</style></head><body><div class="card"><h2>بطاقة مسار الترقية</h2><div class="sub">برنامج مسار</div><div class="row"><span class="label">الاسم:</span><span class="value">${p.name}</span></div><div class="row"><span class="label">الرقم العسكري:</span><span class="value">${p.militaryId}</span></div><div class="row"><span class="label">الرتبة الحالية:</span><span class="value">${p.rank}</span></div><div class="row"><span class="label">الرتبة المستحقة:</span><span class="value" style="color:#198754;">${p.nextRank}</span></div><div class="pts-row"><div class="pt-box"><h3>${p.pSeniority||0}</h3><p>نقاط الأقدمية</p></div><div class="pt-box"><h3>${p.pEdu||0}</h3><p>المؤهلات العلمية</p></div><div class="pt-box"><h3>${p.pCourses||0}</h3><p>الدورات التدريبية</p></div><div class="pt-box"><h3>${p.pPerf||0}</h3><p>تقييم الأداء</p></div></div><div style="text-align:center;margin-top:10px;"><p style="color:#6c757d;font-size:0.85rem;font-weight:700;">ترتيبك في السرا</p><span class="rank-badge"># ${p.queueNum}</span><p style="color:#1f4e78;font-weight:800;font-size:1rem;">إجمالي النقاط: ${p.totalPoints}</p></div><p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:20px;">${new Date().toLocaleDateString('ar-SA')} - برنامج مسار</p></div><script>window.print();<\/script></body></html>`); w.document.close();
+  w.document.write(`<html dir="rtl"><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet"><style>body{font-family:'Cairo',sans-serif;padding:30px;background:#f4f7fa;}.card{background:white;border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:500px;margin:0 auto;}h2{color:#1f4e78;font-size:1.5rem;font-weight:900;text-align:center;margin-bottom:4px;}.sub{text-align:center;color:#e2b372;font-size:0.85rem;font-weight:700;margin-bottom:20px;}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef3fa;font-size:0.9rem;}.label{color:#6c757d;font-weight:700;}.value{font-weight:800;color:#1a1a2e;}.pts-row{display:flex;gap:12px;margin:16px 0;}.pt-box{flex:1;background:#eef3fa;border-radius:10px;padding:12px;text-align:center;}.pt-box h3{color:#1f4e78;font-weight:900;margin:0 0 4px;}.pt-box p{font-size:0.75rem;color:#6c757d;margin:0;font-weight:700;}.rank-badge{background:#1f4e78;color:white;border-radius:30px;padding:10px 20px;text-align:center;font-size:2rem;font-weight:900;margin:20px auto;display:block;width:fit-content;}</style></head><body><div class="card"><h2>بطاقة مسار الترقية</h2><div class="sub">برنامج مسار</div><div class="row"><span class="label">الاسم:</span><span class="value">${p.name}</span></div><div class="row"><span class="label">الرقم العسكري:</span><span class="value">${p.militaryId}</span></div><div class="row"><span class="label">الرتبة الحالية:</span><span class="value">${p.rank}</span></div><div class="row"><span class="label">الرتبة المستحقة:</span><span class="value" style="color:#198754;">${p.nextRank}</span></div><div class="pts-row"><div class="pt-box"><h3>${p.pSeniority||0}</h3><p>نقاط الأقدمية</p></div><div class="pt-box"><h3>${p.pEdu||0}</h3><p>المؤهلات العلمية</p></div><div class="pt-box"><h3>${p.pOther||0}</h3><p>أخرى</p></div></div><div style="text-align:center;margin-top:10px;"><p style="color:#6c757d;font-size:0.85rem;font-weight:700;">ترتيبك في السرا</p><span class="rank-badge"># ${p.queueNum}</span><p style="color:#1f4e78;font-weight:800;font-size:1rem;">إجمالي النقاط: ${p.totalPoints}</p></div><p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:20px;">${new Date().toLocaleDateString('ar-SA')} - برنامج مسار</p></div><script>window.print();<\/script></body></html>`); w.document.close();
 }
 </script>
 </body>
