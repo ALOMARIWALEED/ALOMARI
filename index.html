@@ -6,163 +6,557 @@
 <title>برنامج مسار - ترقيات ضباط الصف</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.2.2/build/index.min.js"></script>
+
 <style>
-:root{--main:#1f4e78;--accent:#e2b372;--bg:#f4f7fa;--shadow:0 4px 20px rgba(0,0,0,.06);}
-*{box-sizing:border-box;}
-body{background:var(--bg);font-family:'Cairo',sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
+:root {
+  --main: #1f4e78;
+  --main-dark: #0f2b46;
+  --main-light: #eef3fa;
+  --accent: #e2b372;
+  --accent-dark: #c99245;
+  --success: #198754;
+  --bg: #f0f4f8;
+  --white: #ffffff;
+  --shadow: 0 4px 24px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,.14);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
 
-/* Navbar */
-.main-nav{background:linear-gradient(135deg,#0f2b46,#1f4e78);color:#fff;padding:15px 20px;box-shadow:0 4px 15px rgba(0,0,0,0.1);}
-.brand-title{font-size:1.4rem;font-weight:800;margin:0;}
-.brand-sub{font-size:0.8rem;color:var(--accent);font-weight:600;letter-spacing:1px;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Main Portal Layout */
-.portal-wrap{max-width:1000px;margin:40px auto;padding:0 20px;flex:1;width:100%;}
-.card-custom{background:#fff;border-radius:20px;box-shadow:var(--shadow);border:none;padding:30px;margin-bottom:25px;position:relative;overflow:hidden;}
-.card-custom::before{content:'';position:absolute;top:0;right:0;width:6px;height:100%;background:var(--main);}
+body {
+  background: var(--bg);
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
 
-/* Dashboard Components */
-.stat-box{background:#f8fbfd;border:1px solid #e2eaf2;border-radius:14px;padding:15px;text-align:center;}
-.stat-box h3{color:var(--main);font-weight:800;margin-bottom:2px;}
-.stat-box p{font-size:12px;color:#6c757d;margin:0;font-weight:700;}
+/* ===== NAVBAR ===== */
+.main-nav {
+  background: linear-gradient(135deg, var(--main-dark) 0%, var(--main) 100%);
+  color: #fff;
+  padding: 14px 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.brand-title { font-size: 1.35rem; font-weight: 800; margin: 0; }
+.brand-sub { font-size: 0.75rem; color: var(--accent); font-weight: 600; letter-spacing: 1px; }
+.nav-btn {
+  border: none;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-btn:hover { transform: translateY(-1px); }
+.nav-btn-light { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.nav-btn-light:hover { background: rgba(255,255,255,0.25); }
+.nav-btn-warning { background: var(--accent); color: var(--main-dark); }
+.nav-btn-warning:hover { background: var(--accent-dark); }
+.nav-btn-danger { background: #dc3545; color: #fff; }
 
-/* Points Badge */
-.points-badge{background:#eef3fa;color:var(--main);padding:8px 15px;border-radius:30px;font-weight:700;font-size:0.9rem;display:inline-block;}
-.rank-number{font-size:3rem;font-weight:900;color:var(--accent);text-shadow:2px 2px 0px rgba(0,0,0,0.05);line-height:1;}
+/* ===== WRAP ===== */
+.portal-wrap { max-width: 1100px; margin: 36px auto; padding: 0 20px; flex: 1; width: 100%; }
 
-/* Sidebar Admin */
-.admin-panel{display:none;}
-.table-responsive{border-radius:12px;overflow:hidden;}
+/* ===== CARDS ===== */
+.card-custom {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: none;
+  padding: 28px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.card-custom::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 5px; height: 100%;
+  background: var(--main);
+}
+
+/* ===== HOMEPAGE ===== */
+#view-home { display: block; }
+
+.hero-section {
+  background: linear-gradient(135deg, var(--main-dark) 0%, var(--main) 60%, #2d6ca8 100%);
+  border-radius: 24px;
+  padding: 60px 40px;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -80px; left: -80px;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+.hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: -100px; right: -60px;
+  width: 350px; height: 350px;
+  background: rgba(226,179,114,0.08);
+  border-radius: 50%;
+}
+.hero-icon {
+  width: 90px; height: 90px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+  margin: 0 auto 20px;
+  position: relative; z-index: 1;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  position: relative; z-index: 1;
+  margin-bottom: 12px;
+}
+.hero-title span { color: var(--accent); }
+.hero-subtitle {
+  font-size: 1rem;
+  opacity: 0.85;
+  max-width: 560px;
+  margin: 0 auto 32px;
+  position: relative; z-index: 1;
+  line-height: 1.8;
+}
+.hero-actions { position: relative; z-index: 1; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.hero-btn {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all .25s;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-btn-primary { background: var(--accent); color: var(--main-dark); }
+.hero-btn-primary:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,179,114,0.4); }
+.hero-btn-secondary { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
+.hero-btn-secondary:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
+.feature-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+  border-top: 4px solid transparent;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.feature-card.blue { border-top-color: var(--main); }
+.feature-card.gold { border-top-color: var(--accent); }
+.feature-card.green { border-top-color: #198754; }
+.feature-card.purple { border-top-color: #6f42c1; }
+.feature-icon { font-size: 2rem; margin-bottom: 12px; }
+.feature-card.blue .feature-icon { color: var(--main); }
+.feature-card.gold .feature-icon { color: var(--accent-dark); }
+.feature-card.green .feature-icon { color: #198754; }
+.feature-card.purple .feature-icon { color: #6f42c1; }
+.feature-card h5 { font-weight: 800; font-size: 0.95rem; color: #1a1a2e; margin-bottom: 6px; }
+.feature-card p { font-size: 0.78rem; color: #6c757d; margin: 0; line-height: 1.6; }
+
+.stats-bar {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px 28px;
+  box-shadow: var(--shadow);
+  display: flex; gap: 0;
+  overflow: hidden;
+}
+.stat-item { flex: 1; text-align: center; padding: 8px 16px; border-left: 1px solid #eee; }
+.stat-item:last-child { border-left: none; }
+.stat-num { font-size: 1.9rem; font-weight: 900; color: var(--main); line-height: 1; }
+.stat-label { font-size: 0.72rem; color: #6c757d; font-weight: 700; margin-top: 4px; }
+
+/* ===== PORTAL VIEW ===== */
+.search-hero { text-align: center; padding: 48px 24px; }
+.search-icon-wrap {
+  width: 80px; height: 80px;
+  background: var(--main-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--main);
+  font-size: 2rem;
+  margin: 0 auto 20px;
+}
+.search-box-wrap .input-group { box-shadow: 0 4px 20px rgba(31,78,120,0.15); border-radius: 12px; overflow: hidden; }
+.search-box-wrap input { border: 2px solid #dde8f4; border-right: none; font-size: 1rem; }
+.search-box-wrap button { background: var(--main); color: white; border: none; padding: 0 24px; font-weight: 700; font-family: 'Cairo', sans-serif; }
+
+/* Result Card */
+.result-header { border-bottom: 2px solid var(--main-light); padding-bottom: 16px; margin-bottom: 20px; }
+.stat-box { background: var(--main-light); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; }
+.stat-box h3 { color: var(--main); font-weight: 900; font-size: 1.5rem; margin-bottom: 2px; }
+.stat-box p { font-size: 11px; color: #6c757d; margin: 0; font-weight: 700; }
+.points-badge { background: var(--main-light); color: var(--main); padding: 8px 18px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; display: inline-block; }
+.rank-number { font-size: 3.5rem; font-weight: 900; color: var(--accent); text-shadow: 2px 2px 0 rgba(0,0,0,0.06); line-height: 1; }
+
+/* ===== ADMIN ===== */
+.admin-topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.action-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: none;
+  transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.action-btn:hover { transform: translateY(-1px); }
+.btn-add { background: #198754; color: white; }
+.btn-import { background: #0d6efd; color: white; }
+.btn-pdf { background: #dc3545; color: white; }
+.btn-word { background: #0d6efd; color: white; }
+.btn-excel-dl { background: #198754; color: white; }
+
+.filter-bar { background: #f8fbfd; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.filter-bar input, .filter-bar select {
+  border: 1px solid #dde8f4;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+  flex: 1;
+  min-width: 160px;
+}
+.filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--main); box-shadow: 0 0 0 3px rgba(31,78,120,0.1); }
+
+.table-responsive { border-radius: 12px; overflow: hidden; }
+.table thead th { background: var(--main); color: white; font-weight: 700; font-size: 0.85rem; padding: 12px 10px; border: none; }
+.table tbody tr:hover { background: #f0f6ff; }
+.table td { font-size: 0.88rem; padding: 11px 10px; vertical-align: middle; }
+
+.badge-rank { padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+.near-promo { background: #fff3cd; }
+
+/* Stats cards */
+.mini-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.mini-stat { background: white; border-radius: var(--radius-sm); padding: 16px; text-align: center; box-shadow: var(--shadow); }
+.mini-stat .num { font-size: 1.6rem; font-weight: 900; color: var(--main); }
+.mini-stat .lbl { font-size: 0.72rem; color: #6c757d; font-weight: 700; }
+
+/* Login card */
+.login-card { max-width: 420px; margin: 0 auto; }
+.login-card .form-control { border: 1.5px solid #dde8f4; border-radius: 8px; padding: 10px 14px; font-family: 'Cairo', sans-serif; }
+.login-card .form-control:focus { border-color: var(--main); box-shadow: 0 0 0 3px rgba(31,78,120,0.1); }
+
+/* Alert */
+.alert-custom { border-radius: 10px; padding: 12px 16px; font-size: 0.88rem; font-weight: 600; margin-bottom: 16px; display: none; }
+.alert-danger { background: #fff0f0; color: #dc3545; border: 1px solid #ffd0d0; }
+.alert-success { background: #f0fff4; color: #198754; border: 1px solid #c3e6cb; }
+.alert-warning { background: #fffbf0; color: #856404; border: 1px solid #ffeeba; }
+
+/* Import area */
+.import-zone {
+  border: 2.5px dashed #bed3e8;
+  border-radius: var(--radius);
+  padding: 36px 24px;
+  text-align: center;
+  background: var(--main-light);
+  cursor: pointer;
+  transition: all .2s;
+}
+.import-zone:hover { border-color: var(--main); background: #e0ecf8; }
+.import-zone i { font-size: 2.5rem; color: var(--main); margin-bottom: 12px; display: block; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title { font-size: 1.6rem; }
+  .hero-section { padding: 40px 20px; }
+  .stats-bar { flex-wrap: wrap; }
+  .stat-item { border-left: none; border-bottom: 1px solid #eee; }
+}
+
+.d-none { display: none !important; }
+.view-section {}
+.badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+.bg-primary-soft { background: #e8f0fe; color: var(--main); }
+.bg-success-soft { background: #e6f4ea; color: #198754; }
+.bg-warning-soft { background: #fef9e7; color: #856404; }
 </style>
 </head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="main-nav d-flex justify-content-between align-items-center flex-wrap gap-2">
   <div>
-    <h1 class="brand-title"><i class="fa-solid fa-layer-group text-warning me-2"></i>برنامج (مسار) الإلكتروني</h1>
-    <div class="brand-sub">نظام ترقيات ضباط الصف - جناح الإدارة</div>
+    <h1 class="brand-title"><i class="fa-solid fa-layer-group" style="color:var(--accent);margin-left:8px;"></i>برنامج (مسار) الإلكتروني</h1>
+    <div class="brand-sub">نظام ترقيات ضباط الصف · جناح الإدارة</div>
   </div>
-  <div class="d-flex gap-2">
-    <button id="btnPortalView" class="btn btn-sm btn-light fw-bold" onclick="switchView('portal')"><i class="fa-solid fa-user"></i> بوابة الاستعلام</button>
-    <button id="btnAdminLoginView" class="btn btn-sm btn-outline-light fw-bold" onclick="switchView('admin-login')"><i class="fa-solid fa-lock"></i> لوحة التحكم</button>
-    <button id="btnAdminDashboardView" class="btn btn-sm btn-warning fw-bold d-none" onclick="switchView('admin-dashboard')"><i class="fa-solid fa-gauge"></i> الإدارة المتقدمة</button>
-    <button id="btnLogout" class="btn btn-sm btn-danger fw-bold d-none" onclick="logoutAdmin()"><i class="fa-solid fa-power-off"></i> خروج</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="nav-btn nav-btn-light" onclick="switchView('home')"><i class="fa-solid fa-house"></i> الرئيسية</button>
+    <button class="nav-btn nav-btn-light" onclick="switchView('portal')"><i class="fa-solid fa-magnifying-glass"></i> الاستعلام</button>
+    <button id="btnAdminLoginView" class="nav-btn nav-btn-light" onclick="switchView('admin-login')"><i class="fa-solid fa-lock"></i> التحكم</button>
+    <button id="btnAdminDashboardView" class="nav-btn nav-btn-warning d-none" onclick="switchView('admin-dashboard')"><i class="fa-solid fa-gauge"></i> الإدارة</button>
+    <button id="btnLogout" class="nav-btn nav-btn-danger d-none" onclick="logoutAdmin()"><i class="fa-solid fa-power-off"></i> خروج</button>
   </div>
 </nav>
 
 <div class="portal-wrap">
 
-  <div id="view-portal" class="view-section">
-    <div class="card-custom text-center py-5">
-      <div class="mx-auto mb-4" style="width:80px;height:80px;background:#eef3fa;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--main);font-size:2rem;">
-        <i class="fa-solid fa-id-card-clip"></i>
+  <!-- ===== HOME VIEW ===== -->
+  <div id="view-home" class="view-section">
+
+    <!-- Hero -->
+    <div class="hero-section">
+      <div class="hero-icon">
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
-      <h3 class="fw-bold mb-2">الاستعلام المباشر عن مسار الترقية</h3>
+      <h2 class="hero-title">برنامج <span>مسار</span> الإلكتروني</h2>
+      <p class="hero-subtitle">منصة متكاملة لإدارة ومتابعة مسارات ترقيات ضباط الصف، تضمن الشفافية والعدالة في تحديد الأولويات وفق المعايير المعتمدة</p>
+      <div class="hero-actions">
+        <button class="hero-btn hero-btn-primary" onclick="switchView('portal')">
+          <i class="fa-solid fa-magnifying-glass"></i> الاستعلام عن ترتيبي
+        </button>
+        <button class="hero-btn hero-btn-secondary" onclick="switchView('admin-login')">
+          <i class="fa-solid fa-lock"></i> لوحة الإدارة
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Stats Bar -->
+    <div class="stats-bar mb-4">
+      <div class="stat-item">
+        <div class="stat-num" id="homeStatTotal">0</div>
+        <div class="stat-label">إجمالي المنسوبين</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="homeStatReady">0</div>
+        <div class="stat-label">مؤهلون للترقية</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="homeStatAvgPts">0</div>
+        <div class="stat-label">متوسط النقاط</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="homeStatTop">-</div>
+        <div class="stat-label">أعلى نقاط</div>
+      </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="features-grid">
+      <div class="feature-card blue" onclick="switchView('portal')">
+        <div class="feature-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+        <h5>بوابة الاستعلام</h5>
+        <p>اعرف ترتيبك في سرا الترقيات ونقاطك التفصيلية فوراً بأدخال رقمك العسكري</p>
+      </div>
+      <div class="feature-card gold" onclick="switchView('admin-login')">
+        <div class="feature-icon"><i class="fa-solid fa-users-gear"></i></div>
+        <h5>إدارة المسارات</h5>
+        <p>أضف وعدل وحذف سجلات المنسوبين بكل سهولة مع تحديث فوري للترتيب</p>
+      </div>
+      <div class="feature-card green" onclick="switchView('admin-login')">
+        <div class="feature-icon"><i class="fa-solid fa-file-excel"></i></div>
+        <h5>استيراد Excel</h5>
+        <p>رفع ملف Excel دفعة واحدة لاستيراد بيانات جميع المنسوبين في ثوانٍ</p>
+      </div>
+      <div class="feature-card purple" onclick="switchView('admin-login')">
+        <div class="feature-icon"><i class="fa-solid fa-file-export"></i></div>
+        <h5>تصدير التقارير</h5>
+        <p>تصدير قائمة الترقيات بتنسيق PDF أو Word أو Excel احترافي جاهز للطباعة</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== PORTAL VIEW ===== -->
+  <div id="view-portal" class="view-section d-none">
+    <div class="card-custom search-hero">
+      <div class="search-icon-wrap"><i class="fa-solid fa-id-card-clip"></i></div>
+      <h3 class="fw-bold mb-2" style="font-size:1.4rem;">الاستعلام المباشر عن مسار الترقية</h3>
       <p class="text-muted small mb-4">أدخل رقمك العسكري للاطلاع على ترتيبك الحالي في السرا وتفاصيل نقاطك بكل شفافية</p>
-      
       <div class="row justify-content-center">
-        <div class="col-md-7">
+        <div class="col-md-6 search-box-wrap">
           <form onsubmit="event.preventDefault(); searchMilitaryId();">
-            <div class="input-group input-group-lg mb-3 shadow-sm">
+            <div class="input-group input-group-lg">
               <input id="searchMilId" type="text" class="form-control text-center fw-bold" placeholder="أدخل الرقم العسكري" required>
-              <button class="btn text-white fw-bold" style="background:var(--main);" type="submit"><i class="fa-solid fa-magnifying-glass"></i> استعلام</button>
+              <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> استعلام</button>
             </div>
           </form>
         </div>
       </div>
+      <div id="searchAlert" class="alert-custom alert-danger mt-3" style="max-width:400px;margin:16px auto 0;"></div>
     </div>
 
-    <div id="searchResultCard" class="card-custom d-none animate__animated animate__fadeIn">
-      <div class="row align-items-center">
-        <div class="col-md-8 border-start-0">
-          <h4 class="fw-bold text-primary mb-3" id="resName">-</h4>
-          <div class="row g-3 mb-3">
-            <div class="col-6 col-sm-4">
-              <small class="text-muted d-block">الرقم العسكري</small>
-              <strong id="resMilId">-</strong>
-            </div>
-            <div class="col-6 col-sm-4">
-              <small class="text-muted d-block">الرتبة الحالية</small>
-              <strong id="resRank">-</strong>
-            </div>
-            <div class="col-6 col-sm-4">
-              <small class="text-muted d-block">الرتبة المستحقة</small>
-              <strong id="resNextRank" class="text-success">-</strong>
-            </div>
-          </div>
-          
-          <hr>
-          
-          <h5 class="fw-bold mb-3 text-secondary"><i class="fa-solid fa-chart-pie me-1"></i> تفاصيل معايير الترقية</h5>
-          <div class="row g-2">
-            <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pSeniority">0</h3><p>نقاط الأقدمية</p></div></div>
-            <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pEdu">0</h3><p>المؤهلات العلمية</p></div></div>
-            <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pCourses">0</h3><p>الدورات التدريبية</p></div></div>
-            <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pPerf">0</h3><p>تقييم الأداء</p></div></div>
-          </div>
+    <div id="searchResultCard" class="card-custom d-none">
+      <div class="result-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h4 class="fw-bold mb-1" id="resName" style="color:var(--main);">-</h4>
+          <span class="badge bg-primary-soft" id="resMilId">-</span>
         </div>
-        <div class="col-md-4 text-center mt-4 mt-md-0 bg-light py-4 rounded">
-          <p class="text-muted fw-bold mb-1">ترتيبك الحالي في السرا</p>
-          <div class="rank-number" id="resQueueNum">-</div>
-          <div class="points-badge mt-2">إجمالي النقاط: <span id="resTotalPoints">0</span></div>
+        <button class="action-btn btn-pdf" onclick="printPersonCard()" style="font-size:0.8rem;">
+          <i class="fa-solid fa-print"></i> طباعة البطاقة
+        </button>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-sm-3">
+          <small class="text-muted d-block fw-bold mb-1">الرتبة الحالية</small>
+          <strong id="resRank" style="font-size:1rem;">-</strong>
         </div>
+        <div class="col-6 col-sm-3">
+          <small class="text-muted d-block fw-bold mb-1">الرتبة المستحقة</small>
+          <strong id="resNextRank" class="text-success" style="font-size:1rem;">-</strong>
+        </div>
+      </div>
+
+      <h5 class="fw-bold mb-3" style="color:#555; font-size:0.95rem;"><i class="fa-solid fa-chart-pie me-1" style="color:var(--main);"></i> تفاصيل معايير الترقية</h5>
+      <div class="row g-3">
+        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pSeniority">0</h3><p>نقاط الأقدمية</p></div></div>
+        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pEdu">0</h3><p>المؤهلات العلمية</p></div></div>
+        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pCourses">0</h3><p>الدورات التدريبية</p></div></div>
+        <div class="col-6 col-sm-3"><div class="stat-box"><h3 id="pPerf">0</h3><p>تقييم الأداء</p></div></div>
+      </div>
+
+      <div class="text-center mt-4 py-4" style="background:var(--main-light);border-radius:var(--radius-sm);">
+        <p class="fw-bold mb-1" style="color:#555; font-size:0.85rem;">ترتيبك الحالي في السرا</p>
+        <div class="rank-number" id="resQueueNum">-</div>
+        <div class="points-badge mt-2">إجمالي النقاط: <span id="resTotalPoints">0</span></div>
       </div>
     </div>
   </div>
 
+  <!-- ===== ADMIN LOGIN ===== -->
   <div id="view-admin-login" class="view-section d-none">
-    <div class="card-custom mx-auto" style="max-width:450px;">
-      <h4 class="fw-bold mb-3 text-center"><i class="fa-solid fa-lock-open text-warning me-2"></i>دخول جناح الإدارة</h4>
+    <div class="card-custom login-card">
+      <div class="text-center mb-4">
+        <div style="width:64px;height:64px;background:var(--main-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.6rem;color:var(--main);">
+          <i class="fa-solid fa-lock-open"></i>
+        </div>
+        <h4 class="fw-bold">دخول جناح الإدارة</h4>
+        <p class="text-muted small">المعلومات الافتراضية: admin / 123</p>
+      </div>
+      <div id="loginAlert" class="alert-custom alert-danger"></div>
       <form onsubmit="event.preventDefault(); loginAdmin();">
         <div class="mb-3">
           <label class="form-label small fw-bold">رمز المسؤول</label>
-          <input id="adminUser" type="text" class="form-control" placeholder="أدخل اسم المستخدم الافتراضي: admin" required>
+          <input id="adminUser" type="text" class="form-control" placeholder="admin" required>
         </div>
         <div class="mb-3">
           <label class="form-label small fw-bold">الرقم السري</label>
-          <input id="adminPass" type="password" class="form-control" placeholder="أدخل الرقم السري الافتراضي: 123" required>
+          <input id="adminPass" type="password" class="form-control" placeholder="••••••" required>
         </div>
-        <button type="submit" class="btn text-white fw-bold w-100 py-2" style="background:var(--main);">تسجيل الدخول</button>
+        <button type="submit" class="action-btn btn-add w-100 justify-content-center" style="padding:11px;font-size:0.95rem;border-radius:10px;">
+          <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول
+        </button>
       </form>
     </div>
   </div>
 
+  <!-- ===== ADMIN DASHBOARD ===== -->
   <div id="view-admin-dashboard" class="view-section d-none">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-      <h4 class="fw-bold m-0"><i class="fa-solid fa-users-gear text-primary"></i> إدارة مسارات المنسوبين</h4>
-      <button class="btn btn-success fw-bold btn-sm" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> إضافة ضابط صف جديد</button>
+
+    <!-- Mini Stats -->
+    <div class="mini-stats" id="adminMiniStats"></div>
+
+    <!-- Action Bar -->
+    <div class="admin-topbar">
+      <h4 class="fw-bold m-0" style="color:var(--main);"><i class="fa-solid fa-users-gear"></i> إدارة مسارات المنسوبين</h4>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="action-btn btn-add" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> إضافة</button>
+        <button class="action-btn btn-import" onclick="document.getElementById('excelFileInput').click()"><i class="fa-solid fa-file-excel"></i> رفع Excel</button>
+        <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="importExcel(event)">
+        <button class="action-btn" style="background:#6f42c1;color:white;" onclick="downloadExcelTemplate()"><i class="fa-solid fa-download"></i> نموذج Excel</button>
+        <button class="action-btn btn-pdf" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+        <button class="action-btn btn-word" onclick="exportWord()"><i class="fa-solid fa-file-word"></i> Word</button>
+        <button class="action-btn btn-excel-dl" onclick="exportExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      </div>
     </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <i class="fa-solid fa-filter" style="color:var(--main);"></i>
+      <input type="text" id="filterName" placeholder="البحث بالاسم أو الرقم..." oninput="renderAdminTable()">
+      <select id="filterRank" onchange="renderAdminTable()">
+        <option value="">كل الرتب</option>
+        <option>جندي أول</option>
+        <option>عريف</option>
+        <option>وكيل رقيب</option>
+        <option>رقيب</option>
+        <option>رقيب أول</option>
+      </select>
+      <select id="filterSort" onchange="renderAdminTable()">
+        <option value="points_desc">الأعلى نقاطاً أولاً</option>
+        <option value="points_asc">الأقل نقاطاً أولاً</option>
+        <option value="name">ترتيب أبجدي</option>
+      </select>
+    </div>
+
+    <div id="importAlert" class="alert-custom alert-success"></div>
 
     <div class="card-custom p-2">
       <div class="table-responsive">
         <table class="table table-hover align-middle text-center mb-0">
-          <thead class="table-light">
+          <thead>
             <tr>
-              <th>ترتيب السرا</th>
+              <th>الترتيب</th>
               <th>الرقم العسكري</th>
               <th>الاسم</th>
               <th>الرتبة الحالية</th>
               <th>الرتبة المستحقة</th>
-              <th>إجمالي النقاط</th>
-              <th>الإجراءات</th>
+              <th>الأقدمية</th>
+              <th>المؤهلات</th>
+              <th>الدورات</th>
+              <th>الأداء</th>
+              <th>الإجمالي</th>
+              <th>إجراءات</th>
             </tr>
           </thead>
-          <tbody id="adminStaffTbody">
-            </tbody>
+          <tbody id="adminStaffTbody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-</div>
+</div><!-- /portal-wrap -->
 
+<!-- ADD/EDIT MODAL -->
 <div class="modal fade" id="staffModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header bg-light">
+      <div class="modal-header" style="background:var(--main);color:white;">
         <h5 class="modal-title fw-bold" id="modalTitle">إضافة ملف منسوب</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <form onsubmit="event.preventDefault(); saveStaffForm();">
         <div class="modal-body p-4">
@@ -187,7 +581,7 @@ body{background:var(--bg);font-family:'Cairo',sans-serif;min-height:100vh;displa
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label small fw-bold">الرتبة المستحقة (القادمة) *</label>
+              <label class="form-label small fw-bold">الرتبة المستحقة *</label>
               <select id="formNextRank" class="form-select" required>
                 <option value="عريف">عريف</option>
                 <option value="وكيل رقيب">وكيل رقيب</option>
@@ -196,42 +590,50 @@ body{background:var(--bg);font-family:'Cairo',sans-serif;min-height:100vh;displa
                 <option value="رئيس رقباء">رئيس رقباء</option>
               </select>
             </div>
-            <hr>
-            <h6 class="fw-bold text-secondary">توزيع النقاط التفصيلي لكل مرحلة</h6>
+
+            <div class="col-12"><hr><h6 class="fw-bold" style="color:#555;">توزيع النقاط التفصيلي</h6></div>
+
             <div class="col-6 col-md-3">
               <label class="form-label small fw-bold">نقاط الأقدمية</label>
-              <input type="number" step="0.01" id="formPSeniority" class="form-control" value="0">
+              <input type="number" step="0.01" min="0" id="formPSeniority" class="form-control" value="0" oninput="calcModalTotal()">
             </div>
             <div class="col-6 col-md-3">
               <label class="form-label small fw-bold">نقاط المؤهلات</label>
-              <input type="number" step="0.01" id="formPEdu" class="form-control" value="0">
+              <input type="number" step="0.01" min="0" id="formPEdu" class="form-control" value="0" oninput="calcModalTotal()">
             </div>
             <div class="col-6 col-md-3">
               <label class="form-label small fw-bold">نقاط الدورات</label>
-              <input type="number" step="0.01" id="formPCourses" class="form-control" value="0">
+              <input type="number" step="0.01" min="0" id="formPCourses" class="form-control" value="0" oninput="calcModalTotal()">
             </div>
             <div class="col-6 col-md-3">
-              <label class="form-label small fw-bold">نقاط تقييم الأداء</label>
-              <input type="number" step="0.01" id="formPPerf" class="form-control" value="0">
+              <label class="form-label small fw-bold">نقاط الأداء</label>
+              <input type="number" step="0.01" min="0" id="formPPerf" class="form-control" value="0" oninput="calcModalTotal()">
+            </div>
+
+            <div class="col-12">
+              <div style="background:var(--main-light);border-radius:10px;padding:12px 16px;text-align:center;">
+                <span class="fw-bold" style="color:#555; font-size:0.9rem;">إجمالي النقاط: </span>
+                <span id="modalTotal" style="font-size:1.4rem;font-weight:900;color:var(--main);">0</span>
+              </div>
             </div>
           </div>
         </div>
         <div class="modal-footer bg-light">
           <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">إلغاء</button>
-          <button type="submit" class="btn text-white fw-bold" style="background:var(--main);">حفظ البيانات</button>
+          <button type="submit" class="action-btn btn-add" style="border-radius:8px;"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
-// ============ CONFIG FIREBASE (نفس الحساب الحالي الخاص بك) ============
+// ========== FIREBASE ==========
 const firebaseConfig = {
   apiKey: "AIzaSyAzyO4oN07WOfqoVzXzNCNWMTvrvNGWFMg",
   authDomain: "surveymoamar.firebaseapp.com",
@@ -239,82 +641,94 @@ const firebaseConfig = {
   projectId: "surveymoamar",
   storageBucket: "surveymoamar.firebasestorage.app",
   messagingSenderId: "944748990071",
-  appId: "1:944748990071:web:e89fb772f86b0583e50072",
-  measurementId: "G-E6796F3RES"
+  appId: "1:944748990071:web:e89fb772f86b0583e50072"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let staffList = [];
+let filteredList = [];
 let modalInstance = null;
 let isAdminLoggedIn = false;
+let currentPersonForPrint = null;
 
-// INITIAL LOAD
+// ========== INIT ==========
 window.addEventListener('DOMContentLoaded', () => {
   modalInstance = new bootstrap.Modal(document.getElementById('staffModal'));
-  
-  // الاستماع المباشر للتعديلات في قاعدة البيانات
   db.ref('masar_staff').on('value', (snapshot) => {
     const data = snapshot.val();
     staffList = data ? Object.values(data) : [];
-    
-    // ترتيب السرا تلقائياً بناءً على إجمالي النقاط (الأعلى أولاً)
     staffList.sort((a, b) => b.totalPoints - a.totalPoints);
-    
+    updateHomeStats();
     renderAdminTable();
+    renderAdminMiniStats();
   });
 });
 
-// NAVIGATION VIEWS
+// ========== NAVIGATION ==========
 function switchView(viewId) {
-  document.querySelectorAll('.view-section').forEach(section => section.classList.add('d-none'));
+  document.querySelectorAll('.view-section').forEach(s => s.classList.add('d-none'));
   document.getElementById('view-' + viewId).classList.remove('d-none');
 }
 
-// SEARCH FUNCTION (PORTAL VIEW)
+// ========== HOME STATS ==========
+function updateHomeStats() {
+  const total = staffList.length;
+  const avg = total ? (staffList.reduce((s, p) => s + p.totalPoints, 0) / total).toFixed(1) : 0;
+  const top = total ? staffList[0].totalPoints : '-';
+  const ready = staffList.filter(p => p.totalPoints >= 70).length;
+  document.getElementById('homeStatTotal').textContent = total;
+  document.getElementById('homeStatAvgPts').textContent = avg;
+  document.getElementById('homeStatTop').textContent = top;
+  document.getElementById('homeStatReady').textContent = ready;
+}
+
+// ========== SEARCH ==========
 function searchMilitaryId() {
   const milIdInput = document.getElementById('searchMilId').value.trim();
-  
-  // البحث عن الرقم العسكري ضمن القائمة المرتبة
   const index = staffList.findIndex(item => item.militaryId === milIdInput);
   const resultCard = document.getElementById('searchResultCard');
-  
+  const alert = document.getElementById('searchAlert');
+
   if (index !== -1) {
     const person = staffList[index];
-    
-    document.getElementById('resName').innerText = person.name;
-    document.getElementById('resMilId').innerText = person.militaryId;
-    document.getElementById('resRank').innerText = person.rank;
-    document.getElementById('resNextRank').innerText = person.nextRank;
-    
-    document.getElementById('pSeniority').innerText = person.pSeniority || 0;
-    document.getElementById('pEdu').innerText = person.pEdu || 0;
-    document.getElementById('pCourses').innerText = person.pCourses || 0;
-    document.getElementById('pPerf').innerText = person.pPerf || 0;
-    
-    document.getElementById('resTotalPoints').innerText = person.totalPoints;
-    document.getElementById('resQueueNum').innerText = index + 1; // رقم السرا المباشر
-    
+    currentPersonForPrint = { ...person, queueNum: index + 1 };
+
+    document.getElementById('resName').textContent = person.name;
+    document.getElementById('resMilId').textContent = 'رقم عسكري: ' + person.militaryId;
+    document.getElementById('resRank').textContent = person.rank;
+    document.getElementById('resNextRank').textContent = person.nextRank;
+    document.getElementById('pSeniority').textContent = person.pSeniority || 0;
+    document.getElementById('pEdu').textContent = person.pEdu || 0;
+    document.getElementById('pCourses').textContent = person.pCourses || 0;
+    document.getElementById('pPerf').textContent = person.pPerf || 0;
+    document.getElementById('resTotalPoints').textContent = person.totalPoints;
+    document.getElementById('resQueueNum').textContent = index + 1;
+
     resultCard.classList.remove('d-none');
+    alert.style.display = 'none';
   } else {
     resultCard.classList.add('d-none');
-    alert('الرقم العسكري غير مسجل بالنظام حالياً. يرجى مراجعة جناح الإدارة.');
+    alert.textContent = 'الرقم العسكري غير مسجل بالنظام. يرجى مراجعة جناح الإدارة.';
+    alert.style.display = 'block';
   }
 }
 
-// ADMIN AUTHENTICATION
+// ========== ADMIN AUTH ==========
 function loginAdmin() {
   const user = document.getElementById('adminUser').value;
   const pass = document.getElementById('adminPass').value;
-  
-  if(user === 'admin' && pass === '123') {
+  const alert = document.getElementById('loginAlert');
+
+  if (user === 'admin' && pass === '123') {
     isAdminLoggedIn = true;
     document.getElementById('btnAdminLoginView').classList.add('d-none');
     document.getElementById('btnAdminDashboardView').classList.remove('d-none');
     document.getElementById('btnLogout').classList.remove('d-none');
     switchView('admin-dashboard');
   } else {
-    alert('خطأ في رمز المسؤول أو الرقم السري!');
+    alert.textContent = 'خطأ في رمز المسؤول أو الرقم السري!';
+    alert.style.display = 'block';
   }
 }
 
@@ -323,66 +737,117 @@ function logoutAdmin() {
   document.getElementById('btnAdminLoginView').classList.remove('d-none');
   document.getElementById('btnAdminDashboardView').classList.add('d-none');
   document.getElementById('btnLogout').classList.add('d-none');
-  switchView('portal');
+  switchView('home');
 }
 
-// RENDER ADMIN TABLE
+// ========== ADMIN TABLE ==========
+function getFilteredList() {
+  const nameQ = (document.getElementById('filterName')?.value || '').trim().toLowerCase();
+  const rankQ = document.getElementById('filterRank')?.value || '';
+  const sortQ = document.getElementById('filterSort')?.value || 'points_desc';
+
+  let list = [...staffList];
+
+  if (nameQ) list = list.filter(s => s.name.toLowerCase().includes(nameQ) || s.militaryId.includes(nameQ));
+  if (rankQ) list = list.filter(s => s.rank === rankQ);
+
+  if (sortQ === 'points_asc') list.sort((a, b) => a.totalPoints - b.totalPoints);
+  else if (sortQ === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+  else list.sort((a, b) => b.totalPoints - a.totalPoints);
+
+  return list;
+}
+
 function renderAdminTable() {
   const tbody = document.getElementById('adminStaffTbody');
-  if(!tbody) return;
-  
-  if(staffList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-muted p-4">لا توجد سجلات حالياً في مسار الترقيات</td></tr>`;
+  if (!tbody) return;
+
+  filteredList = getFilteredList();
+
+  if (filteredList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="text-muted p-4">لا توجد سجلات تطابق البحث</td></tr>`;
     return;
   }
-  
-  tbody.innerHTML = staffList.map((staff, idx) => `
-    <tr>
-      <td><span class="badge bg-secondary p-2 fs-6"># ${idx + 1}</span></td>
-      <td><strong>${staff.militaryId}</strong></td>
-      <td>${staff.name}</td>
-      <td>${staff.rank}</td>
-      <td><span class="text-success fw-bold">${staff.nextRank}</span></td>
-      <td><span class="badge bg-primary p-2">${staff.totalPoints}</span></td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditModal('${staff.militaryId}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteStaff('${staff.militaryId}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>
-  `).join('');
+
+  // Map to get real rank in full list
+  const fullRankMap = {};
+  staffList.forEach((s, i) => { fullRankMap[s.militaryId] = i + 1; });
+
+  tbody.innerHTML = filteredList.map((staff) => {
+    const realRank = fullRankMap[staff.militaryId] || '-';
+    const nearPromo = staff.totalPoints >= 70 ? 'near-promo' : '';
+    return `
+      <tr class="${nearPromo}">
+        <td><span class="badge" style="background:var(--main);color:white;font-size:0.85rem;padding:6px 12px;">#${realRank}</span></td>
+        <td><strong>${staff.militaryId}</strong></td>
+        <td>${staff.name}</td>
+        <td><span class="badge bg-primary-soft">${staff.rank}</span></td>
+        <td><span class="badge bg-success-soft">${staff.nextRank}</span></td>
+        <td>${staff.pSeniority || 0}</td>
+        <td>${staff.pEdu || 0}</td>
+        <td>${staff.pCourses || 0}</td>
+        <td>${staff.pPerf || 0}</td>
+        <td><span class="badge" style="background:#1f4e78;color:white;padding:6px 12px;">${staff.totalPoints}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditModal('${staff.militaryId}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteStaff('${staff.militaryId}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>`;
+  }).join('');
 }
 
-// DATA MANAGEMENT (CRUD)
+function renderAdminMiniStats() {
+  const el = document.getElementById('adminMiniStats');
+  if (!el) return;
+  const total = staffList.length;
+  const avg = total ? (staffList.reduce((s, p) => s + p.totalPoints, 0) / total).toFixed(1) : 0;
+  const top = total ? staffList[0] : null;
+  const ranks = {};
+  staffList.forEach(s => { ranks[s.rank] = (ranks[s.rank] || 0) + 1; });
+  const topRank = Object.entries(ranks).sort((a, b) => b[1] - a[1])[0];
+
+  el.innerHTML = `
+    <div class="mini-stat"><div class="num">${total}</div><div class="lbl">إجمالي المنسوبين</div></div>
+    <div class="mini-stat"><div class="num">${avg}</div><div class="lbl">متوسط النقاط</div></div>
+    <div class="mini-stat"><div class="num">${top ? top.totalPoints : '-'}</div><div class="lbl">أعلى نقاط</div></div>
+    <div class="mini-stat"><div class="num">${topRank ? topRank[1] : 0}</div><div class="lbl">أكثر رتبة (${topRank ? topRank[0] : '-'})</div></div>
+  `;
+}
+
+// ========== MODAL ==========
+function calcModalTotal() {
+  const s = parseFloat(document.getElementById('formPSeniority').value) || 0;
+  const e = parseFloat(document.getElementById('formPEdu').value) || 0;
+  const c = parseFloat(document.getElementById('formPCourses').value) || 0;
+  const p = parseFloat(document.getElementById('formPPerf').value) || 0;
+  document.getElementById('modalTotal').textContent = parseFloat((s + e + c + p).toFixed(2));
+}
+
 function openAddModal() {
-  document.getElementById('modalTitle').innerText = "إضافة ملف منسوب جديد";
+  document.getElementById('modalTitle').textContent = "إضافة ملف منسوب جديد";
   document.getElementById('formId').value = "";
   document.getElementById('formMilId').removeAttribute('readonly');
-  document.getElementById('formMilId').value = "";
-  document.getElementById('formName').value = "";
-  document.getElementById('formPSeniority').value = 0;
-  document.getElementById('formPEdu').value = 0;
-  document.getElementById('formPCourses').value = 0;
-  document.getElementById('formPPerf').value = 0;
+  ['formMilId','formName'].forEach(id => document.getElementById(id).value = '');
+  ['formPSeniority','formPEdu','formPCourses','formPPerf'].forEach(id => document.getElementById(id).value = 0);
+  calcModalTotal();
   modalInstance.show();
 }
 
 function openEditModal(milId) {
   const staff = staffList.find(s => s.militaryId === milId);
-  if(!staff) return;
-  
-  document.getElementById('modalTitle').innerText = "تعديل بيانات مسار الترقية";
+  if (!staff) return;
+  document.getElementById('modalTitle').textContent = "تعديل بيانات مسار الترقية";
   document.getElementById('formId').value = staff.militaryId;
   document.getElementById('formMilId').value = staff.militaryId;
   document.getElementById('formMilId').setAttribute('readonly', 'true');
   document.getElementById('formName').value = staff.name;
   document.getElementById('formRank').value = staff.rank;
   document.getElementById('formNextRank').value = staff.nextRank;
-  
   document.getElementById('formPSeniority').value = staff.pSeniority || 0;
   document.getElementById('formPEdu').value = staff.pEdu || 0;
   document.getElementById('formPCourses').value = staff.pCourses || 0;
   document.getElementById('formPPerf').value = staff.pPerf || 0;
-  
+  calcModalTotal();
   modalInstance.show();
 }
 
@@ -391,36 +856,226 @@ async function saveStaffForm() {
   const name = document.getElementById('formName').value.trim();
   const rank = document.getElementById('formRank').value;
   const nextRank = document.getElementById('formNextRank').value;
-  
   const pSeniority = parseFloat(document.getElementById('formPSeniority').value) || 0;
   const pEdu = parseFloat(document.getElementById('formPEdu').value) || 0;
   const pCourses = parseFloat(document.getElementById('formPCourses').value) || 0;
   const pPerf = parseFloat(document.getElementById('formPPerf').value) || 0;
-  
   const totalPoints = parseFloat((pSeniority + pEdu + pCourses + pPerf).toFixed(2));
-  
-  const record = {
-    militaryId: milId,
-    name: name,
-    rank: rank,
-    nextRank: nextRank,
-    pSeniority: pSeniority,
-    pEdu: pEdu,
-    pCourses: pCourses,
-    pPerf: pPerf,
-    totalPoints: totalPoints
-  };
-  
-  await db.ref('masar_staff/' + milId).set(record);
+
+  await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pCourses, pPerf, totalPoints });
   modalInstance.hide();
-  alert('تم حفظ البيانات بنجاح في مسار الترقية.');
+  showAlert('importAlert', 'تم حفظ البيانات بنجاح ✓', 'success');
 }
 
 async function deleteStaff(milId) {
-  if(confirm('هل أنت متأكد من حذف هذا السجل نهائياً من سرا الترقيات؟')) {
+  if (confirm('هل أنت متأكد من حذف هذا السجل نهائياً؟')) {
     await db.ref('masar_staff/' + milId).remove();
-    alert('تم حذف السجل.');
+    showAlert('importAlert', 'تم حذف السجل بنجاح.', 'success');
   }
+}
+
+// ========== HELPER ==========
+function showAlert(id, msg, type = 'success') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `alert-custom alert-${type}`;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// ========== EXCEL IMPORT ==========
+function importExcel(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: 0 });
+
+      if (rows.length === 0) { showAlert('importAlert', 'الملف فارغ أو لا يحتوي على بيانات.', 'danger'); return; }
+
+      let count = 0;
+      for (const row of rows) {
+        const milId = String(row['الرقم العسكري'] || row['militaryId'] || '').trim();
+        const name = String(row['الاسم'] || row['name'] || '').trim();
+        const rank = String(row['الرتبة الحالية'] || row['rank'] || 'جندي أول').trim();
+        const nextRank = String(row['الرتبة المستحقة'] || row['nextRank'] || 'عريف').trim();
+        const pSeniority = parseFloat(row['نقاط الأقدمية'] || row['pSeniority'] || 0);
+        const pEdu = parseFloat(row['نقاط المؤهلات'] || row['pEdu'] || 0);
+        const pCourses = parseFloat(row['نقاط الدورات'] || row['pCourses'] || 0);
+        const pPerf = parseFloat(row['نقاط الأداء'] || row['pPerf'] || 0);
+        const totalPoints = parseFloat((pSeniority + pEdu + pCourses + pPerf).toFixed(2));
+
+        if (!milId || !name) continue;
+        await db.ref('masar_staff/' + milId).set({ militaryId: milId, name, rank, nextRank, pSeniority, pEdu, pCourses, pPerf, totalPoints });
+        count++;
+      }
+
+      showAlert('importAlert', `✓ تم استيراد ${count} سجل بنجاح من ملف Excel`, 'success');
+      event.target.value = '';
+    } catch (err) {
+      showAlert('importAlert', 'خطأ في قراءة الملف. تأكد من تنسيق الأعمدة.', 'danger');
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+// ========== DOWNLOAD EXCEL TEMPLATE ==========
+function downloadExcelTemplate() {
+  const headers = [['الرقم العسكري','الاسم','الرتبة الحالية','الرتبة المستحقة','نقاط الأقدمية','نقاط المؤهلات','نقاط الدورات','نقاط الأداء']];
+  const sample = [['12345','مثال للاسم','رقيب','رقيب أول',40,15,20,25]];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([...headers, ...sample]);
+  ws['!cols'] = headers[0].map(() => ({ wch: 18 }));
+  XLSX.utils.book_append_sheet(wb, ws, 'مسار');
+  XLSX.writeFile(wb, 'نموذج_مسار.xlsx');
+}
+
+// ========== EXPORT EXCEL ==========
+function exportExcel() {
+  const data = staffList.map((s, i) => ({
+    'الترتيب': i + 1,
+    'الرقم العسكري': s.militaryId,
+    'الاسم الكامل': s.name,
+    'الرتبة الحالية': s.rank,
+    'الرتبة المستحقة': s.nextRank,
+    'نقاط الأقدمية': s.pSeniority || 0,
+    'نقاط المؤهلات': s.pEdu || 0,
+    'نقاط الدورات': s.pCourses || 0,
+    'نقاط الأداء': s.pPerf || 0,
+    'إجمالي النقاط': s.totalPoints
+  }));
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
+  ws['!cols'] = Object.keys(data[0] || {}).map(() => ({ wch: 18 }));
+  XLSX.utils.book_append_sheet(wb, ws, 'مسار الترقيات');
+  XLSX.writeFile(wb, 'مسار_الترقيات.xlsx');
+}
+
+// ========== EXPORT PDF ==========
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+  // Title (no Arabic font support in jsPDF without custom font, use transliteration)
+  doc.setFontSize(16);
+  doc.text('Masar Program - Promotions List', 148, 18, { align: 'center' });
+  doc.setFontSize(10);
+  doc.text('Date: ' + new Date().toLocaleDateString('ar-SA'), 148, 26, { align: 'center' });
+
+  const head = [['#', 'Military ID', 'Name', 'Current Rank', 'Next Rank', 'Seniority', 'Edu', 'Courses', 'Perf', 'Total']];
+  const body = staffList.map((s, i) => [
+    i + 1, s.militaryId, s.name, s.rank, s.nextRank,
+    s.pSeniority || 0, s.pEdu || 0, s.pCourses || 0, s.pPerf || 0, s.totalPoints
+  ]);
+
+  doc.autoTable({
+    head, body,
+    startY: 32,
+    styles: { fontSize: 9, halign: 'center', font: 'helvetica' },
+    headStyles: { fillColor: [31, 78, 120], textColor: 255, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [238, 243, 250] },
+    margin: { left: 10, right: 10 }
+  });
+
+  doc.save('masar_promotions.pdf');
+}
+
+// ========== EXPORT WORD ==========
+async function exportWord() {
+  if (typeof docx === 'undefined') {
+    showAlert('importAlert', 'مكتبة Word لم تُحمّل بعد، يرجى المحاولة مرة أخرى.', 'danger');
+    return;
+  }
+
+  const { Document, Packer, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, HeadingLevel } = docx;
+
+  const headerRow = new TableRow({
+    children: ['الترتيب','الرقم العسكري','الاسم','الرتبة الحالية','الرتبة المستحقة','الأقدمية','المؤهلات','الدورات','الأداء','الإجمالي'].map(text =>
+      new TableCell({ children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18 })] })] })
+    )
+  });
+
+  const dataRows = staffList.map((s, i) =>
+    new TableRow({
+      children: [
+        String(i + 1), s.militaryId, s.name, s.rank, s.nextRank,
+        String(s.pSeniority || 0), String(s.pEdu || 0), String(s.pCourses || 0), String(s.pPerf || 0), String(s.totalPoints)
+      ].map(text =>
+        new TableCell({ children: [new Paragraph({ children: [new TextRun({ text, size: 18 })] })] })
+      )
+    })
+  );
+
+  const doc2 = new Document({
+    sections: [{
+      children: [
+        new Paragraph({ text: 'برنامج مسار - قائمة الترقيات', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+        new Paragraph({ text: 'التاريخ: ' + new Date().toLocaleDateString('ar-SA'), alignment: AlignmentType.CENTER }),
+        new Paragraph({ text: '' }),
+        new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE } })
+      ]
+    }]
+  });
+
+  const buffer = await Packer.toBlob(doc2);
+  const url = URL.createObjectURL(buffer);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'masar_promotions.docx';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ========== PRINT PERSON CARD ==========
+function printPersonCard() {
+  if (!currentPersonForPrint) return;
+  const p = currentPersonForPrint;
+  const w = window.open('', '_blank', 'width=600,height=700');
+  w.document.write(`
+    <html dir="rtl"><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Cairo', sans-serif; padding: 30px; background: #f4f7fa; }
+      .card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+      h2 { color: #1f4e78; font-size: 1.5rem; font-weight: 900; text-align: center; margin-bottom: 4px; }
+      .sub { text-align: center; color: #e2b372; font-size: 0.85rem; font-weight: 700; margin-bottom: 20px; }
+      .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eef3fa; font-size: 0.9rem; }
+      .label { color: #6c757d; font-weight: 700; }
+      .value { font-weight: 800; color: #1a1a2e; }
+      .pts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+      .pt-box { background: #eef3fa; border-radius: 10px; padding: 12px; text-align: center; }
+      .pt-box h3 { color: #1f4e78; font-weight: 900; margin: 0 0 4px; }
+      .pt-box p { font-size: 0.75rem; color: #6c757d; margin: 0; font-weight: 700; }
+      .rank-badge { background: #1f4e78; color: white; border-radius: 30px; padding: 10px 20px; text-align: center; font-size: 2rem; font-weight: 900; margin: 20px auto; display: block; width: fit-content; }
+    </style></head><body>
+    <div class="card">
+      <h2>بطاقة مسار الترقية</h2>
+      <div class="sub">برنامج مسار الإلكتروني</div>
+      <div class="row"><span class="label">الاسم:</span><span class="value">${p.name}</span></div>
+      <div class="row"><span class="label">الرقم العسكري:</span><span class="value">${p.militaryId}</span></div>
+      <div class="row"><span class="label">الرتبة الحالية:</span><span class="value">${p.rank}</span></div>
+      <div class="row"><span class="label">الرتبة المستحقة:</span><span class="value" style="color:#198754;">${p.nextRank}</span></div>
+      <div class="pts-row">
+        <div class="pt-box"><h3>${p.pSeniority||0}</h3><p>نقاط الأقدمية</p></div>
+        <div class="pt-box"><h3>${p.pEdu||0}</h3><p>المؤهلات العلمية</p></div>
+        <div class="pt-box"><h3>${p.pCourses||0}</h3><p>الدورات التدريبية</p></div>
+        <div class="pt-box"><h3>${p.pPerf||0}</h3><p>تقييم الأداء</p></div>
+      </div>
+      <div style="text-align:center; margin-top:10px;">
+        <p style="color:#6c757d;font-size:0.85rem;font-weight:700;">ترتيبك في السرا</p>
+        <span class="rank-badge"># ${p.queueNum}</span>
+        <p style="color:#1f4e78;font-weight:800;font-size:1rem;">إجمالي النقاط: ${p.totalPoints}</p>
+      </div>
+      <p style="text-align:center;font-size:0.72rem;color:#aaa;margin-top:20px;">${new Date().toLocaleDateString('ar-SA')} - برنامج مسار الإلكتروني</p>
+    </div>
+    <script>window.print();<\/script>
+    </body></html>
+  `);
+  w.document.close();
 }
 </script>
 </body>
